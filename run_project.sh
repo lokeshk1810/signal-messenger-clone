@@ -3,6 +3,12 @@ set -e
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+echo "==> Cleaning up any existing processes on ports 8000 and 3000..."
+fuser -k 8000/tcp 3000/tcp 2>/dev/null || true
+pkill -f "uvicorn main:app" 2>/dev/null || true
+pkill -f "next dev" 2>/dev/null || true
+sleep 1
+
 echo "==> Starting Signal Clone Full Stack..."
 
 # Start Backend
@@ -32,6 +38,7 @@ cleanup() {
     echo "Stopping servers..."
     kill $BACKEND_PID 2>/dev/null || true
     kill $FRONTEND_PID 2>/dev/null || true
+    fuser -k 8000/tcp 3000/tcp 2>/dev/null || true
     exit 0
 }
 
